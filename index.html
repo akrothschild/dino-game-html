@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chrome Dino Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            overflow: hidden;
+            background: #f7f7f7;
+        }
+        #game {
+            display: block;
+            margin: 0 auto;
+            background: #fff;
+            width: 600px;
+            height: 200px;
+            border: 1px solid #000;
+            position: relative;
+        }
+        #dino {
+            width: 40px;
+            height: 40px;
+            background: #000;
+            position: absolute;
+            bottom: 0;
+            left: 50px;
+        }
+        .obstacle {
+            width: 20px;
+            height: 40px;
+            background: #555;
+            position: absolute;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="game">
+        <div id="dino"></div>
+    </div>
+
+    <script>
+        const game = document.getElementById('game');
+        const dino = document.getElementById('dino');
+        let isJumping = false;
+        let isGameOver = false;
+
+        function jump() {
+            if (isJumping) return;
+            isJumping = true;
+            let upInterval = setInterval(() => {
+                if (dino.offsetTop <= 50) {
+                    clearInterval(upInterval);
+                    let downInterval = setInterval(() => {
+                        if (dino.offsetTop >= 160) {
+                            clearInterval(downInterval);
+                            isJumping = false;
+                        }
+                        dino.style.top = dino.offsetTop + 20 + 'px';
+                    }, 20);
+                }
+                dino.style.top = dino.offsetTop - 20 + 'px';
+            }, 20);
+        }
+
+        function createObstacle() {
+            const obstacle = document.createElement('div');
+            obstacle.classList.add('obstacle');
+            obstacle.style.left = game.offsetWidth + 'px';
+            game.appendChild(obstacle);
+
+            let obstacleInterval = setInterval(() => {
+                if (obstacle.offsetLeft < 0) {
+                    clearInterval(obstacleInterval);
+                    game.removeChild(obstacle);
+                }
+
+                if (obstacle.offsetLeft > 50 && obstacle.offsetLeft < 90 && dino.offsetTop >= 160) {
+                    clearInterval(obstacleInterval);
+                    isGameOver = true;
+                    alert('Game Over');
+                }
+
+                obstacle.style.left = obstacle.offsetLeft - 10 + 'px';
+            }, 20);
+
+            if (!isGameOver) setTimeout(createObstacle, 2000);
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.code === 'Space') {
+                jump();
+            }
+        });
+
+        createObstacle();
+    </script>
+</body>
+</html>
